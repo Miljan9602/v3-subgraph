@@ -36,6 +36,7 @@ export function handleBurnHelper(event: BurnEvent, factoryAddress: string = FACT
 
     // update globals
     factory.txCount = factory.txCount.plus(ONE_BI)
+    factory.burnCount = factory.burnCount.plus(ONE_BI)
 
     // update token0 data
     token0.txCount = token0.txCount.plus(ONE_BI)
@@ -45,6 +46,8 @@ export function handleBurnHelper(event: BurnEvent, factoryAddress: string = FACT
 
     // pool data
     pool.txCount = pool.txCount.plus(ONE_BI)
+    pool.burnCount = pool.burnCount.plus(ONE_BI)
+
     // Pools liquidity tracks the currently active liquidity given pools current tick.
     // We only want to update it on burn if the position being burnt includes the current tick.
     if (
@@ -75,6 +78,8 @@ export function handleBurnHelper(event: BurnEvent, factoryAddress: string = FACT
     burn.tickLower = BigInt.fromI32(event.params.tickLower)
     burn.tickUpper = BigInt.fromI32(event.params.tickUpper)
     burn.logIndex = event.logIndex
+    burn.firstTokenUsdPrice = pool.token0Price
+    burn.secondTokenUsdPrice = pool.token1Price
 
     // tick entities
     const lowerTickId = poolAddress + '#' + BigInt.fromI32(event.params.tickLower).toString()

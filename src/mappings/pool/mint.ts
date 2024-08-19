@@ -39,6 +39,7 @@ export function handleMintHelper(event: MintEvent, factoryAddress: string = FACT
 
     // update globals
     factory.txCount = factory.txCount.plus(ONE_BI)
+    factory.mintCount = factory.mintCount.plus(ONE_BI)
 
     // update token0 data
     token0.txCount = token0.txCount.plus(ONE_BI)
@@ -52,6 +53,7 @@ export function handleMintHelper(event: MintEvent, factoryAddress: string = FACT
 
     // pool data
     pool.txCount = pool.txCount.plus(ONE_BI)
+    pool.mintCount = pool.mintCount.plus(ONE_BI)
 
     // Pools liquidity tracks the currently active liquidity given pools current tick.
     // We only want to update it on mint if the new position includes the current tick.
@@ -91,6 +93,8 @@ export function handleMintHelper(event: MintEvent, factoryAddress: string = FACT
     mint.tickLower = BigInt.fromI32(event.params.tickLower)
     mint.tickUpper = BigInt.fromI32(event.params.tickUpper)
     mint.logIndex = event.logIndex
+    mint.firstTokenUsdPrice = pool.token0Price
+    mint.secondTokenUsdPrice = pool.token1Price
 
     // tick entities
     const lowerTickIdx = event.params.tickLower

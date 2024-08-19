@@ -5,6 +5,16 @@ type Factory @entity {
   poolCount: BigInt!
   # amoutn of transactions all time
   txCount: BigInt!
+
+  # amoutn of transactions all time
+  mintCount: BigInt!
+
+ # amoutn of transactions all time
+  burnCount: BigInt!
+
+  # amoutn of transactions all time
+  swapCount: BigInt!
+
   # total volume all time in derived USD
   totalVolumeUSD: BigDecimal!
   # total volume all time in derived ETH
@@ -109,6 +119,11 @@ type Pool @entity {
   feesUSD: BigDecimal!
   # all time number of transactions
   txCount: BigInt!
+
+  mintCount: BigInt!
+  swapCount: BigInt!
+  burnCount: BigInt!
+
   # all time fees collected token0
   collectedFeesToken0: BigDecimal!
   # all time fees collected token1
@@ -213,6 +228,9 @@ type Mint @entity {
   tickUpper: BigInt!
   # order within the txn
   logIndex: BigInt
+
+  firstTokenUsdPrice: BigDecimal
+  secondTokenUsdPrice: BigDecimal
 }
 
 type Burn @entity {
@@ -246,6 +264,9 @@ type Burn @entity {
   tickUpper: BigInt!
   # position within the transactions
   logIndex: BigInt
+
+  firstTokenUsdPrice: BigDecimal
+  secondTokenUsdPrice: BigDecimal
 }
 
 type Swap @entity {
@@ -279,6 +300,17 @@ type Swap @entity {
   tick: BigInt!
   # index within the txn
   logIndex: BigInt
+
+  feesUSD: BigDecimal
+  # total swap fees all time in USD
+  feesETH: BigDecimal
+
+  firstTokenUsdPrice: BigDecimal!
+  secondTokenUsdPrice: BigDecimal!
+  amount0In: BigDecimal!
+  amount1In: BigDecimal!
+  amount0Out: BigDecimal!
+  amount1Out: BigDecimal!
 }
 
 type Collect @entity {

@@ -11,9 +11,9 @@ dataSources:
     name: Factory
     network: sei
     source:
-      address: '0x12437643B9c943201407695409386c264516c0BC'
+      address: '0x0bcea088e977a03113a880cF7c5b6165D8304B16'
       abi: Factory
-      startBlock: 86706080
+      startBlock: 93307586
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7

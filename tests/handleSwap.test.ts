@@ -128,7 +128,6 @@ describe('handleSwap', () => {
       wrappedNativeAddress,
       stablecoinAddresses,
       minimumEthLocked,
-      whitelistTokens,
     )
 
     const newEthPrice = getEthPriceInUSD(USDC_WETH_03_MAINNET_POOL, true)

@@ -42,6 +42,9 @@ export function handlePoolCreatedHelper(
     factory.totalValueLockedUSDUntracked = ZERO_BD
     factory.totalValueLockedETHUntracked = ZERO_BD
     factory.txCount = ZERO_BI
+    factory.mintCount = ZERO_BI
+    factory.swapCount = ZERO_BI
+    factory.burnCount = ZERO_BI
     factory.owner = ADDRESS_ZERO
 
     // create new bundle for tracking eth price
@@ -128,6 +131,9 @@ export function handlePoolCreatedHelper(
   pool.createdAtBlockNumber = event.block.number
   pool.liquidityProviderCount = ZERO_BI
   pool.txCount = ZERO_BI
+  pool.mintCount = ZERO_BI
+  pool.swapCount = ZERO_BI
+  pool.burnCount = ZERO_BI
   pool.liquidity = ZERO_BI
   pool.sqrtPrice = ZERO_BI
   pool.token0Price = ZERO_BD

@@ -6,7 +6,7 @@ import { ONE_BD, ZERO_BD, ZERO_BI } from './constants'
 
 export const WETH_ADDRESS = '0x027d2e627209f1ceba52adc8a5afe9318459b44b'
 
-export const USDC_WETH_03_POOL = '0xf072dbe382232047755bfa3728017ef1d4a612ca'
+export const USDC_WETH_03_POOL = '0xe33633a1364d4fc7686a22fa6ac56dcd7f72f420'
 export const STABLECOIN_IS_TOKEN0 = false
 
 // token where amounts should contribute to tracked volume and liquidity
@@ -14,7 +14,7 @@ export const STABLECOIN_IS_TOKEN0 = false
 export const WHITELIST_TOKENS: string[] = [
   WETH_ADDRESS, // WETH
   // '0x6b175474e89094c44da98b954eedeac495271d0f', // DAI
-  '0x027D2E627209f1cebA52ADc8A5aFE9318459b44B', // wsei
+  '0x027d2e627209f1ceba52adc8a5afe9318459b44b', // wsei
   '0xf4855a5aaf42bf27163d8981b16bb0ef80620550', // USDC
   '0x8b595a7b0cd41f3c0dac80114f6a351274be60e6', // USDT
   // '0x0000000000085d4780b73119b644ae5ecd22b376', // TUSD
@@ -139,27 +139,29 @@ export function getTrackedAmountUSD(
   token0: Token,
   tokenAmount1: BigDecimal,
   token1: Token,
-  whitelistTokens: string[] = WHITELIST_TOKENS,
 ): BigDecimal {
   const bundle = Bundle.load('1')!
   const price0USD = token0.derivedETH.times(bundle.ethPriceUSD)
   const price1USD = token1.derivedETH.times(bundle.ethPriceUSD)
 
-  // both are whitelist tokens, return sum of both amounts
-  if (whitelistTokens.includes(token0.id) && whitelistTokens.includes(token1.id)) {
-    return tokenAmount0.times(price0USD).plus(tokenAmount1.times(price1USD))
-  }
+  // For us, everything is tracked.
+  return tokenAmount0.times(price0USD).plus(tokenAmount1.times(price1USD))
 
-  // take double value of the whitelisted token amount
-  if (whitelistTokens.includes(token0.id) && !whitelistTokens.includes(token1.id)) {
-    return tokenAmount0.times(price0USD).times(BigDecimal.fromString('2'))
-  }
-
-  // take double value of the whitelisted token amount
-  if (!whitelistTokens.includes(token0.id) && whitelistTokens.includes(token1.id)) {
-    return tokenAmount1.times(price1USD).times(BigDecimal.fromString('2'))
-  }
+  // // both are whitelist tokens, return sum of both amounts
+  // if (whitelistTokens.includes(token0.id) && whitelistTokens.includes(token1.id)) {
+  //   return tokenAmount0.times(price0USD).plus(tokenAmount1.times(price1USD))
+  // }
+  //
+  // // take double value of the whitelisted token amount
+  // if (whitelistTokens.includes(token0.id) && !whitelistTokens.includes(token1.id)) {
+  //   return tokenAmount0.times(price0USD).times(BigDecimal.fromString('2'))
+  // }
+  //
+  // // take double value of the whitelisted token amount
+  // if (!whitelistTokens.includes(token0.id) && whitelistTokens.includes(token1.id)) {
+  //   return tokenAmount1.times(price1USD).times(BigDecimal.fromString('2'))
+  // }
 
   // neither token is on white list, tracked amount is 0
-  return ZERO_BD
+  // return ZERO_BD
 }

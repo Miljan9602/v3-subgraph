@@ -21,7 +21,6 @@ import {
   STABLECOIN_IS_TOKEN0,
   USDC_WETH_03_POOL,
   WETH_ADDRESS,
-  WHITELIST_TOKENS,
 } from '../../utils/pricing'
 
 export function handleSwap(event: SwapEvent): void {
@@ -35,21 +34,16 @@ export function handleSwapHelper(
   wrappedNativeAddress: string = WETH_ADDRESS,
   stablecoinAddresses: string[] = STABLE_COINS,
   minimumEthLocked: BigDecimal = MINIMUM_ETH_LOCKED,
-  whitelistTokens: string[] = WHITELIST_TOKENS,
 ): void {
   const bundle = Bundle.load('1')!
   const factory = Factory.load(FACTORY_ADDRESS)!
   const pool = Pool.load(event.address.toHexString())!
 
-  // hot fix for bad pricing
-  if (pool.id == '0x9663f2ca0454accad3e094448ea6f77443880454') {
-    return
-  }
-
   const token0 = Token.load(pool.token0)
   const token1 = Token.load(pool.token1)
 
   if (token0 && token1) {
+
     // amounts - 0/1 are token deltas: can be positive or negative
     const amount0 = convertTokenToDecimal(event.params.amount0, token0.decimals)
     const amount1 = convertTokenToDecimal(event.params.amount1, token1.decimals)
@@ -75,7 +69,6 @@ export function handleSwapHelper(
       token0 as Token,
       amount1Abs,
       token1 as Token,
-      whitelistTokens,
     ).div(BigDecimal.fromString('2'))
     const amountTotalETHTracked = safeDiv(amountTotalUSDTracked, bundle.ethPriceUSD)
     const amountTotalUSDUntracked = amount0USD.plus(amount1USD).div(BigDecimal.fromString('2'))
@@ -85,6 +78,7 @@ export function handleSwapHelper(
 
     // global updates
     factory.txCount = factory.txCount.plus(ONE_BI)
+    factory.swapCount = factory.swapCount.plus(ONE_BI)
     factory.totalVolumeETH = factory.totalVolumeETH.plus(amountTotalETHTracked)
     factory.totalVolumeUSD = factory.totalVolumeUSD.plus(amountTotalUSDTracked)
     factory.untrackedVolumeUSD = factory.untrackedVolumeUSD.plus(amountTotalUSDUntracked)
@@ -102,6 +96,7 @@ export function handleSwapHelper(
     pool.untrackedVolumeUSD = pool.untrackedVolumeUSD.plus(amountTotalUSDUntracked)
     pool.feesUSD = pool.feesUSD.plus(feesUSD)
     pool.txCount = pool.txCount.plus(ONE_BI)
+    pool.swapCount = pool.swapCount.plus(ONE_BI)
 
     // Update the pool with the new active liquidity, price, and tick.
     pool.liquidity = event.params.liquidity
@@ -126,7 +121,7 @@ export function handleSwapHelper(
     token1.feesUSD = token1.feesUSD.plus(feesUSD)
     token1.txCount = token1.txCount.plus(ONE_BI)
 
-    // updated pool ratess
+    // updated pool rates
     const prices = sqrtPriceX96ToTokenPrices(pool.sqrtPrice, token0 as Token, token1 as Token)
     pool.token0Price = prices[0]
     pool.token1Price = prices[1]
@@ -169,6 +164,30 @@ export function handleSwapHelper(
     swap.tick = BigInt.fromI32(event.params.tick as i32)
     swap.sqrtPriceX96 = event.params.sqrtPriceX96
     swap.logIndex = event.logIndex
+    swap.firstTokenUsdPrice = prices[0]
+    swap.secondTokenUsdPrice = prices[1]
+    swap.feesETH = feesETH
+    swap.feesUSD = feesUSD
+
+    // So we can follow up events same as v2.
+    swap.amount0In = BigDecimal.zero()
+    swap.amount1In = BigDecimal.zero()
+    swap.amount0Out = BigDecimal.zero()
+    swap.amount1Out = BigDecimal.zero()
+
+    if (amount0 < amount1) {
+      swap.amount0In = BigDecimal.zero()
+      swap.amount0Out = amount0Abs
+
+      swap.amount1In = amount1Abs
+      swap.amount1Out = BigDecimal.zero()
+    } else if (amount1 < amount0) {
+      swap.amount1In = BigDecimal.zero()
+      swap.amount1Out = amount1Abs
+
+      swap.amount0In = amount0Abs
+      swap.amount0Out = BigDecimal.zero()
+    }
 
     // interval data
     const uniswapDayData = updateUniswapDayData(event)
